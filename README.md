@@ -2,7 +2,21 @@
 
 [C3](https://c3-lang.org/) bindings for [r3d](https://github.com/Bigfoot71/r3d/).
 
-These bindings are written manually and are still a work in progress. Feel free to open an issue to describe any problems you run into.
+These bindings are written manually and are still a work in progress.
+
+Feel free to open an issue to describe any problems you run into.
+
+## Installation
+
+There is no tagged release yet. A first official release, bundling a matching
+prebuilt `r3d.c3l`, is planned alongside r3d's upcoming `0.12.0` version.
+
+In the meantime, a `r3d.c3l` archive with the latest bindings and matching
+prebuilt binaries (Windows, Linux, macOS) is available as a build artifact
+from the [Actions tab](https://github.com/Bigfoot71/r3d-c3/actions).
+
+Download the latest successful run's `r3d.c3l` artifact, and drop it into
+your project's `lib/` directory.
 
 ## Quick Start
 
