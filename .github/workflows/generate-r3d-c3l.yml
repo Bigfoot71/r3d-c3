@@ -106,15 +106,9 @@ jobs:
             copy_lib "$lib" "r3d-macos-latest-Release-clang" "work/r3d.c3l/macos-aarch64"
           done
 
-      - name: Create r3d.c3l archive
-        run: |
-          set -euo pipefail
-          cd work/r3d.c3l
-          zip -r ../../r3d.c3l.zip . -x '.git*'
-
       - name: Upload r3d.c3l artifact
         uses: actions/upload-artifact@v4
         with:
           name: r3d.c3l
-          path: r3d.c3l.zip
+          path: work/r3d.c3l
           if-no-files-found: error
