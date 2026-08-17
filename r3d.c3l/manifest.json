@@ -4,16 +4,16 @@
         "linux-x64" : {
             "link-args" : [],
             "dependencies" : ["raylib55"],
-            "linked-libraries" : ["r3d", "assimp", "stdc++", "z"]
+            "linked-libraries" : ["r3d", "raylib", "assimp", "stdc++", "z"]
         },
         "macos-aarch64" : {
             "link-args" : [],
             "dependencies" : ["raylib55"],
-            "linked-libraries" : ["r3d", "assimp", "c++", "z"]
+            "linked-libraries" : ["r3d", "raylib", "assimp", "c++", "z"]
         },
         "windows-x64" : {
             "dependencies" : ["raylib55"],
-            "linked-libraries" : ["r3d", "assimp-vc143-mt", "zlibstatic"]
+            "linked-libraries" : ["r3d", "raylib", "assimp-vc143-mt", "zlibstatic"]
         }
     }
 }
