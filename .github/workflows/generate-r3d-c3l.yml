@@ -1,0 +1,120 @@
+name: Generate r3d.c3l Artifact
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: "Run ID from the source repo (Bigfoot71/r3d) to use"
+        required: true
+        type: string
+
+env:
+  R3D_SOURCE_REPO: Bigfoot71/r3d
+  R3D_SOURCE_WORKFLOW: build.yml
+
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    outputs:
+      run_id: ${{ steps.resolve.outputs.run_id }}
+      should_run: ${{ steps.resolve.outputs.should_run }}
+    steps:
+      - name: Resolve source run id
+        id: resolve
+        env:
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
+          DISPATCH_ID: ${{ inputs.run_id }}
+        run: |
+          set -euo pipefail
+
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            ID="$DISPATCH_ID"
+          else
+            ID=$(printf '%s\n' "$COMMIT_MSG" | grep -oP '(?<=^Generate:\s)\d+' | tail -n1 || true)
+          fi
+
+          if [ -z "${ID:-}" ]; then
+            echo "No generation ID found, stopping here."
+            echo "should_run=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if ! [[ "$ID" =~ ^[0-9]+$ ]]; then
+            echo "::error::Invalid run id: '$ID'"
+            exit 1
+          fi
+
+          echo "Source: https://github.com/${{ env.R3D_SOURCE_REPO }}/actions/runs/$ID"
+          echo "run_id=$ID" >> "$GITHUB_OUTPUT"
+          echo "should_run=true" >> "$GITHUB_OUTPUT"
+
+  build-artifact:
+    needs: resolve
+    if: needs.resolve.outputs.should_run == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts from source run
+        uses: dawidd6/action-download-artifact@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          workflow: ${{ env.R3D_SOURCE_WORKFLOW }}
+          repo: ${{ env.R3D_SOURCE_REPO }}
+          run_id: ${{ needs.resolve.outputs.run_id }}
+          path: ./prebuilt-libs
+          skip_unpack: false
+
+      - name: Prepare working copy of r3d.c3l
+        run: |
+          set -euo pipefail
+          rm -rf work
+          mkdir -p work
+          cp -R r3d.c3l work/r3d.c3l
+
+      - name: Stage binaries into r3d.c3l
+        run: |
+          set -euo pipefail
+
+          copy_lib() {
+            local name=$1 artifact_pattern=$2 dest=$3
+            local file
+            file=$(find ./prebuilt-libs/ -path "*${artifact_pattern}*" -name "$name" | head -1)
+            if [ -z "$file" ]; then
+              echo "::error::File not found: $name (artifact pattern: $artifact_pattern)"
+              exit 1
+            fi
+            echo "Copying $file -> $dest/$name"
+            cp "$file" "$dest/$name"
+          }
+
+          mkdir -p work/r3d.c3l/windows-x64 work/r3d.c3l/linux-x64 work/r3d.c3l/macos-aarch64
+
+          for lib in r3d.lib assimp-vc143-mt.lib zlibstatic.lib; do
+            copy_lib "$lib" "r3d-windows-2022-Release-cl" "work/r3d.c3l/windows-x64"
+          done
+
+          for lib in libr3d.a libassimp.a; do
+            copy_lib "$lib" "r3d-ubuntu-latest-Release-clang" "work/r3d.c3l/linux-x64"
+          done
+
+          for lib in libr3d.a libassimp.a; do
+            copy_lib "$lib" "r3d-macos-latest-Release-clang" "work/r3d.c3l/macos-aarch64"
+          done
+
+      - name: Create r3d.c3l archive
+        run: |
+          set -euo pipefail
+          cd work/r3d.c3l
+          zip -r ../../r3d.c3l.zip . -x '.git*'
+
+      - name: Upload r3d.c3l artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: r3d.c3l
+          path: r3d.c3l.zip
+          if-no-files-found: error
