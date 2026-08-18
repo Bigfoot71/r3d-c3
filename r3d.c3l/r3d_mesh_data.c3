@@ -68,11 +68,11 @@ struct R3DMeshData
 
  All allocated memory is zero-initialized.
 
- @param vertex_count : `number of vertices to allocate (capacity); must be > 0`
- @param index_count : `number of indices to allocate (capacity); may be 0. If 0, no index buffer is allocated`
+ @param vertex_capacity : `number of vertices to allocate; must be > 0`
+ @param index_capacity : `number of indices to allocate; may be 0. If 0, no index buffer is allocated`
  @return `a new R3DMeshData with allocated buffers and zero element counts`
 *>
-extern fn R3DMeshData load_mesh_data(int vertex_count, int index_count) @cname("R3D_LoadMeshData");
+extern fn R3DMeshData load_mesh_data(int vertex_capacity, int index_capacity) @cname("R3D_LoadMeshData");
 
 <*
  Releases memory used by a mesh data container.
