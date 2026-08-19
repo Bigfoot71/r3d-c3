@@ -14,17 +14,15 @@ import raylib55;
 // ========================================
 
 <*
- Transparency modes.
+ Material transparency handling modes.
 
- This enumeration defines how a material handles transparency during rendering.
- It controls whether transparency is disabled, rendered using a depth pre-pass,
- or rendered with standard alpha blending.
+ Defines how material opacity and blending are processed during rendering.
 *>
 enum R3DTransparencyMode : int
 {
-    DISABLED,   // No transparency, supports alpha cutoff.
-    PREPASS,    // Supports transparency with shadows. Writes shadows for alpha > 0.1 and depth for alpha > 0.99.
-    ALPHA,      // Standard transparency without shadows or depth writes.
+    OPAQUE,     // Fully opaque in G-Buffer (supports hard alpha cutoff/masking). Ignores blend mode.
+    HYBRID,     // Two-pass rendering: opaque cutoff in G-Buffer + forward blending.
+    BLEND,      // Blended only (forward pass, no depth write / shadow casting).
 }
 
 <*
@@ -43,16 +41,16 @@ enum R3DBillboardMode : int
 <*
  Blend modes.
 
- Defines common blending modes used in 3D rendering to combine source and destination colors.
-
- The blend mode is applied only if you are in forward rendering mode or auto-detect mode.
+ Defines common blending modes to combine source and destination colors.
+ NOTE: Ignored when R3DTransparencyMode.OPAQUE is selected.
 *>
 enum R3DBlendMode : int
 {
-    MIX,                    // Default mode: the result will be opaque or alpha blended depending on the transparency mode.
-    ADDITIVE,               // Additive blending: source color is added to the destination, making bright effects.
-    MULTIPLY,               // Multiply blending: source color is multiplied with the destination, darkening the image.
-    PREMULTIPLIED_ALPHA,    // Premultiplied alpha blending: source color is blended with the destination assuming the source color is already multiplied by its alpha.
+    ALPHA,                  // Standard alpha blending: source color is blended using its alpha channel.
+    ADDITIVE,               // Pure additive blending: source color is added directly to destination (ignores alpha).
+    ADD_ALPHA,              // Alpha-modulated additive blending: source color scaled by alpha before adding to destination.
+	MULTIPLY,               // Multiply blending: source color is multiplied with destination, darkening the image.
+    PREMULTIPLIED_ALPHA,    // Premultiplied alpha blending: assumes source color is already multiplied by its alpha.
 }
 
 <*
@@ -248,7 +246,7 @@ const R3DMaterial MATERIAL_BASE = {
     },
     .uv_offset = { 0.0f, 0.0f },
     .uv_scale = { 1.0f, 1.0f },
-    .alpha_cutoff = 0.01f,
+    .alpha_cutoff = 0.5f,
     .depth = {
         .mode = LESS,
         .offset_factor = 0.0f,
@@ -264,9 +262,9 @@ const R3DMaterial MATERIAL_BASE = {
         .op_z_fail = KEEP,
         .op_pass = REPLACE,
     },
-    .transparency_mode = DISABLED,
+    .transparency_mode = OPAQUE,
     .billboard_mode = DISABLED,
-    .blend_mode = MIX,
+    .blend_mode = ALPHA,
     .cull_mode = BACK,
     .unlit = false,
     .priority = 0,
