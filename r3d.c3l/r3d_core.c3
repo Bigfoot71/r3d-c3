@@ -112,7 +112,7 @@ enum R3DOutputMode : int
     ALBEDO,
     NORMAL,
     ORM,
-    DIFFUSE,
+    RADIANCE,
     SPECULAR,
     SSAO,
     SSIL,
