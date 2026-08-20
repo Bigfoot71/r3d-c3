@@ -69,6 +69,10 @@ enum R3DTonemap : int
 
 <*
  Background and skybox configuration.
+
+ NOTE: A transparent or semi-transparent background color is supported,
+ but effects that blur/spread geometry (like bloom or DoF) will bleed
+ or fade at silhouettes instead of blending with real content behind.
 *>
 struct R3DEnvBackground
 {
