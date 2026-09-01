@@ -22,15 +22,15 @@ import raylib55;
 *>
 enum R3DShadowCastMode : int
 {
-    CAST_ON_AUTO,               // The object casts shadows; the faces used are determined by the material's culling mode.
-    CAST_ON_DOUBLE_SIDED,       // The object casts shadows with both front and back faces, ignoring face culling.
-    CAST_ON_FRONT_SIDE,         // The object casts shadows with only front faces, culling back faces.
-    CAST_ON_BACK_SIDE,          // The object casts shadows with only back faces, culling front faces.
-    CAST_ONLY_AUTO,             // The object only casts shadows; the faces used are determined by the material's culling mode.
-    CAST_ONLY_DOUBLE_SIDED,     // The object only casts shadows with both front and back faces, ignoring face culling.
-    CAST_ONLY_FRONT_SIDE,       // The object only casts shadows with only front faces, culling back faces.
-    CAST_ONLY_BACK_SIDE,        // The object only casts shadows with only back faces, culling front faces.
-    CAST_DISABLED,              // The object does not cast shadows at all.
+    ON_AUTO,               // The object casts shadows; the faces used are determined by the material's culling mode.
+    ON_DOUBLE_SIDED,       // The object casts shadows with both front and back faces, ignoring face culling.
+    ON_FRONT_SIDE,         // The object casts shadows with only front faces, culling back faces.
+    ON_BACK_SIDE,          // The object casts shadows with only back faces, culling front faces.
+    ONLY_AUTO,             // The object only casts shadows; the faces used are determined by the material's culling mode.
+    ONLY_DOUBLE_SIDED,     // The object only casts shadows with both front and back faces, ignoring face culling.
+    ONLY_FRONT_SIDE,       // The object only casts shadows with only front faces, culling back faces.
+    ONLY_BACK_SIDE,        // The object only casts shadows with only back faces, culling front faces.
+    DISABLED,              // The object does not cast shadows at all.
 }
 
 // ========================================
